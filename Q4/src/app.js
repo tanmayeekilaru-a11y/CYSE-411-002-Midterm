@@ -39,13 +39,31 @@ function sanitizeSearchQuery(input) {
     //   - Trim leading/trailing whitespace before processing
     //   - Max 40 characters
     //   - Return null if the result is empty after sanitization
-    return input;   // UNSAFE – returns raw input unchanged
-}
+    function sanitizeSearchQuery(input) {
+    if (!input) return null;
+
+    // Trim whitespace
+    let sanitized = input.trim();
+
+    // Enforce max length
+    if (sanitized.length > 40) {
+        sanitized = sanitized.substring(0, 40);
+    }
+
+    // Allow only valid characters
+    const regex = /^[a-zA-Z0-9 _-]+$/;
+
+    if (!regex.test(sanitized)) {
+        return null;
+    }
+
+    return sanitized.length > 0 ? sanitized : null;
+} 
 
 function performSearch(query) {
     const sanitized = sanitizeSearchQuery(query);
     const label = document.getElementById("search-label");
-    label.innerHTML = "Showing results for: " + sanitized;  // UNSAFE
+   label.textContent = "Showing results for: " + sanitized;
 }
 
 
