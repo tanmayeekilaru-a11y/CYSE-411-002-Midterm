@@ -36,8 +36,19 @@ function loadDashboardState() {
 
 
 function saveDashboardState() {
+    const validFilters = ['all', 'low', 'medium', 'high', 'critical'];
     const filterInput = document.getElementById("filter-select");
-    const filter      = filterInput.value;    // Not validated before storing
+    if (!filterInput) return;
+
+    const filter = filterInput.value;
+
+    // Validate before saving
+    if (!validFilters.includes(filter)) {
+        console.warn('Attempted to save invalid filter value:', filter);
+        return; // do not save invalid values
+    }
+
+    // Safe save
     localStorage.setItem("dashboardState", JSON.stringify({ filter: filter }));
     currentFilter = filter;
 }
@@ -78,19 +89,41 @@ async function fetchIncidents() {
 //  VULNERABILITY 2: No validation of the incidents array or
 //    individual incident fields before rendering.
 
-
 function renderIncidents(incidents) {
-    const container = document.getElementById("incident-list");
-    container.innerHTML = "";                  // Clear previous results
+    const container = document.getElementById('incident-list');
+    container.textContent = ''; // clear existing content
 
-    incidents.forEach(function (incident) {
-        const item = document.createElement("li");
-        // UNSAFE – directly inserts API response as HTML
-        item.innerHTML =
-            "<strong>" + incident.title + "</strong>" +
-            " <span class='severity severity-" + incident.severity + "'>" +
-            incident.severity + "</span>";
-        container.appendChild(item);
+    if (!Array.isArray(incidents)) {
+        const errorMsg = document.createElement('p');
+        errorMsg.textContent = 'Error: Incident data is unavailable.';
+        container.appendChild(errorMsg);
+        return;
+    }
+
+    const validSeverities = ['low', 'medium', 'high', 'critical'];
+
+    incidents.forEach(incident => {
+        if (!incident || typeof incident.title !== 'string' || incident.title.trim() === '') {
+            console.warn('Skipping incident with invalid or empty title:', incident);
+            return;
+        }
+        if (!validSeverities.includes(incident.severity)) {
+            console.warn('Skipping incident with invalid severity:', incident);
+            return;
+        }
+
+        const li = document.createElement('li');
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = incident.title;
+
+        const severitySpan = document.createElement('span');
+        severitySpan.textContent = ` [${incident.severity}]`;
+
+        li.appendChild(titleSpan);
+        li.appendChild(severitySpan);
+
+        container.appendChild(li);
     });
 }
 
