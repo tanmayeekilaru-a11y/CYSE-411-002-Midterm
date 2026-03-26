@@ -62,8 +62,15 @@ function sanitizeSearchQuery(input) {
 
 function performSearch(query) {
     const sanitized = sanitizeSearchQuery(query);
+
     const label = document.getElementById("search-label");
-   label.textContent = "Showing results for: " + sanitized;
+
+    if (sanitized === null) {
+        label.textContent = "Invalid search query.";
+        return;
+    }
+    
+    label.textContent = "Showing results for: " + sanitized;
 }
 
 
