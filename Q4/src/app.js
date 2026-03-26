@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
         directory.appendChild(card);
     });
 
+
     document.getElementById("search-btn").addEventListener("click", function () {
         const query = document.getElementById("search-input").value;
         performSearch(query);
