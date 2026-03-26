@@ -5,8 +5,23 @@
 
 function loadSession() {
     const raw = sessionStorage.getItem("session");
-    const session = JSON.parse(raw);          // No try/catch
-    return session;                            // No field validation
+    if (!raw) return null;
+
+    try {
+        const session = JSON.parse(raw);
+
+        if (
+            typeof session.userId === "string" && session.userId.trim() !== "" &&
+            typeof session.role === "string" && session.role.trim() !== "" &&
+            typeof session.displayName === "string" && session.displayName.trim() !== ""
+        ) {
+            return session;
+        }
+    } catch (e) {
+        console.error("Invalid session data:", e);
+    }
+
+    return null; // Reject invalid session
 }
 
 
